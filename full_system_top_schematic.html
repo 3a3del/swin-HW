@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>full_system_top — Block Diagram</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: #060f08;
+  font-family: 'Courier New', monospace;
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+}
+#toolbar {
+  position: fixed; top: 0; left: 0; right: 0; height: 38px;
+  background: #0a160c; border-bottom: 1px solid #1c3a20;
+  display: flex; align-items: center; padding: 0 14px; gap: 18px; z-index: 999;
+}
+#toolbar h1 { font-size: 12px; color: #00ff88; letter-spacing: 1px; font-weight: bold; }
+.sep { width: 1px; height: 20px; background: #1c3a20; }
+.leg { display: flex; align-items: center; gap: 5px; font-size: 10px; color: #7a9a7a; }
+.ld { width: 22px; height: 3px; border-radius: 2px; }
+#hint { margin-left: auto; font-size: 10px; color: #2a3a2a; }
+#viewport {
+  position: fixed; top: 38px; left: 0; right: 0; bottom: 0;
+  overflow: hidden; cursor: grab;
+}
+#viewport.dragging { cursor: grabbing; }
+#world { position: absolute; top: 0; left: 0; transform-origin: 0 0; }
+svg { display: block; }
+</style>
+</head>
+<body>
+
+<div id="toolbar">
+  <h1>full_system_top.sv &mdash; Block Diagram</h1>
+  <div class="sep"></div>
+  <div class="leg"><div class="ld" style="background:#00ff88"></div>Data Bus</div>
+  <div class="leg"><div class="ld" style="background:#ffaa00"></div>Control</div>
+  <div class="leg"><div class="ld" style="background:#ff4466"></div>CLK/RST</div>
+  <div class="leg"><div class="ld" style="background:#44aaff"></div>CPU/DMA</div>
+  <div class="leg"><div class="ld" style="background:#cc44ff"></div>MMU Feedback</div>
+  <div id="hint">Scroll=zoom &nbsp; Drag=pan</div>
+</div>
+
+<div id="viewport">
+<div id="world">
+<svg xmlns="http://www.w3.org/2000/svg" width="2400" height="1300" viewBox="0 0 2400 1300">
+<defs>
+  <marker id="ag" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#00ff88"/></marker>
+  <marker id="ao" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#ffaa00"/></marker>
+  <marker id="ar" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#ff4466"/></marker>
+  <marker id="ab" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#44aaff"/></marker>
+  <marker id="ap" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#cc44ff"/></marker>
+  <pattern id="grid" x="0" y="0" width="50" height="50" patternUnits="userSpaceOnUse">
+    <path d="M50,0 L0,0 L0,50" fill="none" stroke="#0c1e0e" stroke-width="0.8"/>
+  </pattern>
+</defs>
+
+<!-- Background -->
+<rect width="2400" height="1300" fill="#060f08"/>
+<rect width="2400" height="1300" fill="url(#grid)"/>
+
+<!-- CLK/RST global bar -->
+<rect x="80" y="26" width="2230" height="26" rx="4" fill="#1a0808" stroke="#ff4466" stroke-width="1.2"/>
+<text x="1195" y="43" text-anchor="middle" font-family="Courier New" font-size="11" font-weight="bold" fill="#ff4466" letter-spacing="2">CLK / RST_N Global Bus</text>
+
+<!-- CLK drops -->
+<g stroke="#ff4466" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#ar)">
+  <line x1="240" y1="52" x2="240" y2="108"/>
+  <line x1="240" y1="52" x2="240" y2="498"/>
+  <line x1="500" y1="52" x2="500" y2="210"/>
+  <line x1="720" y1="52" x2="720" y2="88"/>
+  <line x1="720" y1="52" x2="720" y2="470"/>
+  <line x1="1000" y1="52" x2="1000" y2="80"/>
+  <line x1="1000" y1="52" x2="1000" y2="448"/>
+  <line x1="1290" y1="52" x2="1290" y2="228"/>
+  <line x1="1550" y1="52" x2="1550" y2="228"/>
+  <line x1="1830" y1="52" x2="1830" y2="228"/>
+</g>
+
+<!-- u_wmem -->
+<rect x="100" y="108" width="280" height="115" rx="5" fill="#07190e" stroke="#00ff88" stroke-width="1.8"/>
+<rect x="100" y="108" width="280" height="26" rx="5" fill="#0b2414"/>
+<rect x="100" y="128" width="280" height="6" fill="#0b2414"/>
+<text x="240" y="123" text-anchor="middle" font-family="Courier New" font-size="12" font-weight="bold" fill="#00ff88">weight_memory</text>
+<text x="240" y="147" text-anchor="middle" font-family="Courier New" font-size="9" fill="#44aa77">u_wmem</text>
+<text x="240" y="164" text-anchor="middle" font-family="Courier New" font-size="8.5" fill="#336655">18 432 x 32-bit words</text>
+<text x="240" y="179" text-anchor="middle" font-family="Courier New" font-size="8" fill="#2a5544">Conv: w[0..1247] | MLP: W1[0..9215]+W2[9216..18431]</text>
+<text x="240" y="193" text-anchor="middle" font-family="Courier New" font-size="8" fill="#2a5544">wr_addr[14:0] wr_data[31:0] wr_en | rd_addr rd_en rd_data</text>
+
+<!-- u_fib -->
+<rect x="100" y="498" width="280" height="115" rx="5" fill="#07190e" stroke="#00ff88" stroke-width="1.8"/>
+<rect x="100" y="498" width="280" height="26" rx="5" fill="#0b2414"/>
+<rect x="100" y="518" width="280" height="6" fill="#0b2414"/>
+<text x="240" y="513" text-anchor="middle" font-family="Courier New" font-size="12" font-weight="bold" fill="#00ff88">fib_memory</text>
+<text x="240" y="537" text-anchor="middle" font-family="Courier New" font-size="9" fill="#44aa77">u_fib</text>
+<text x="240" y="554" text-anchor="middle" font-family="Courier New" font-size="8.5" fill="#336655">75 264 x 32-bit words</text>
+<text x="240" y="569" text-anchor="middle" font-family="Courier New" font-size="8" fill="#2a5544">Conv: image[0..37631] CHW 224x224x3</text>
+<text x="240" y="583" text-anchor="middle" font-family="Courier New" font-size="8" fill="#2a5544">MLP: X[0..75263] 3136r x 24w row-major</text>
+<text x="240" y="597" text-anchor="middle" font-family="Courier New" font-size="8" fill="#2a5544">wr_addr[16:0] wr_data[31:0] wr_en | rd_addr rd_en rd_data</text>
+
+<!-- CPU/DMA weight write -->
+<rect x="20" y="68" width="70" height="58" rx="4" fill="#08101c" stroke="#44aaff" stroke-width="1.5"/>
+<text x="55" y="90" text-anchor="middle" font-family="Courier New" font-size="9" font-weight="bold" fill="#44aaff">CPU/DMA</text>
+<text x="55" y="106" text-anchor="middle" font-family="Courier New" font-size="8" fill="#2278bb">Weight WR</text>
+<text x="55" y="120" text-anchor="middle" font-family="Courier New" font-size="7" fill="#1a5588">wr_addr/data/en</text>
+
+<!-- CPU/DMA fib write -->
+<rect x="20" y="460" width="70" height="58" rx="4" fill="#08101c" stroke="#44aaff" stroke-width="1.5"/>
+<text x="55" y="482" text-anchor="middle" font-family="Courier New" font-size="9" font-weight="bold" fill="#44aaff">CPU/DMA</text>
+<text x="55" y="498" text-anchor="middle" font-family="Courier New" font-size="8" fill="#2278bb">FIB WR</text>
+<text x="55" y="512" text-anchor="middle" font-family="Courier New" font-size="7" fill="#1a5588">wr_addr/data/en</text>
+
+<polyline points="90,97 100,97 100,145" fill="none" stroke="#44aaff" stroke-width="1.5" marker-end="url(#ab)"/>
+<polyline points="90,489 100,489 100,543" fill="none" stroke="#44aaff" stroke-width="1.5" marker-end="url(#ab)"/>
+
+<!-- u_dsu -->
+<rect x="420" y="210" width="190" height="420" rx="5" fill="#1c0e04" stroke="#ffaa00" stroke-width="2"/>
+<rect x="420" y="210" width="190" height="28" rx="5" fill="#2a1606"/>
+<rect x="420" y="232" width="190" height="6" fill="#2a1606"/>
+<text x="515" y="226" text-anchor="middle" font-family="Courier New" font-size="13" font-weight="bold" fill="#ffaa00">dsu</text>
+<text x="515" y="252" text-anchor="middle" font-family="Courier New" font-size="9" fill="#cc8822">Data Selection Unit</text>
+<text x="515" y="268" text-anchor="middle" font-family="Courier New" font-size="8" fill="#885522">u_dsu</text>
+<text x="428" y="292" font-family="Courier New" font-size="7.5" fill="#886622">PHYSICAL MEMORY PORTS:</text>
+<text x="428" y="309" font-family="Courier New" font-size="7.5" fill="#664400">wmem_rd_data[31:0] (in)</text>
+<text x="428" y="323" font-family="Courier New" font-size="7.5" fill="#aa6600">wmem_rd_addr[14:0] (out)</text>
+<text x="428" y="337" font-family="Courier New" font-size="7.5" fill="#aa6600">wmem_rd_en (out)</text>
+<text x="428" y="356" font-family="Courier New" font-size="7.5" fill="#664400">fib_rd_data[31:0] (in)</text>
+<text x="428" y="370" font-family="Courier New" font-size="7.5" fill="#aa6600">fib_rd_addr[16:0] (out)</text>
+<text x="428" y="384" font-family="Courier New" font-size="7.5" fill="#aa6600">fib_rd_en (out)</text>
+<text x="428" y="403" font-family="Courier New" font-size="7.5" fill="#886622">CONTROLLER PORTS:</text>
+<text x="428" y="419" font-family="Courier New" font-size="7.5" fill="#664400">conv_wmem_addr/en (in)</text>
+<text x="428" y="433" font-family="Courier New" font-size="7.5" fill="#aa6600">conv_wmem_rd_data (out)</text>
+<text x="428" y="449" font-family="Courier New" font-size="7.5" fill="#664400">conv_imem_addr/en (in)</text>
+<text x="428" y="463" font-family="Courier New" font-size="7.5" fill="#aa6600">conv_imem_rd_data (out)</text>
+<text x="428" y="479" font-family="Courier New" font-size="7.5" fill="#664400">conv_omem_addr/en (in)</text>
+<text x="428" y="498" font-family="Courier New" font-size="7.5" fill="#664400">fc_w1/w2/x_addr/en (in)</text>
+<text x="428" y="512" font-family="Courier New" font-size="7.5" fill="#aa6600">fc_*_rd_data (out)</text>
+<text x="428" y="526" font-family="Courier New" font-size="7.5" fill="#664400">fc_omem_addr/en (in)</text>
+<text x="428" y="545" font-family="Courier New" font-size="7.5" fill="#664400">obuf_rd_data[31:0] (in)</text>
+<text x="428" y="559" font-family="Courier New" font-size="7.5" fill="#aa6600">omem_wr_addr[18:0] (out)</text>
+<text x="428" y="573" font-family="Courier New" font-size="7.5" fill="#aa6600">omem_wr_data[31:0] (out)</text>
+<text x="428" y="587" font-family="Courier New" font-size="7.5" fill="#aa6600">omem_wr_en (out)</text>
+<text x="428" y="606" font-family="Courier New" font-size="7.5" fill="#664400">mode (select routing)</text>
+
+<line x1="420" y1="307" x2="408" y2="307" stroke="#00ff88" stroke-width="1.5"/>
+<line x1="420" y1="354" x2="408" y2="354" stroke="#00ff88" stroke-width="1.5"/>
+<line x1="610" y1="426" x2="622" y2="426" stroke="#ffaa00" stroke-width="1.5"/>
+<line x1="610" y1="460" x2="622" y2="460" stroke="#ffaa00" stroke-width="1.5"/>
+<line x1="610" y1="505" x2="622" y2="505" stroke="#ffaa00" stroke-width="1.5"/>
+<line x1="610" y1="543" x2="622" y2="543" stroke="#00ff88" stroke-width="1.5"/>
+<line x1="610" y1="568" x2="622" y2="568" stroke="#00ff88" stroke-width="1.5"/>
+
+<!-- wmem rd_data -> DSU -->
+<polyline points="380,145 408,145 408,307 420,307" fill="none" stroke="#00ff88" stroke-width="2" marker-end="url(#ag)"/>
+<!-- DSU rd_addr -> wmem -->
+<polyline points="420,323 406,323 406,165 380,165" fill="none" stroke="#ffaa00" stroke-width="1.5" marker-end="url(#ao)"/>
+<!-- fib rd_data -> DSU -->
+<polyline points="380,543 407,543 407,354 420,354" fill="none" stroke="#00ff88" stroke-width="2" marker-end="url(#ag)"/>
+<!-- DSU rd_addr -> fib -->
+<polyline points="420,370 405,370 405,563 380,563" fill="none" stroke="#ffaa00" stroke-width="1.5" marker-end="url(#ao)"/>
+
+<!-- u_conv_ctrl -->
+<rect x="650" y="88" width="220" height="295" rx="5" fill="#06101c" stroke="#44aaff" stroke-width="1.8"/>
+<rect x="650" y="88" width="220" height="26" rx="5" fill="#0a1828"/>
+<rect x="650" y="108" width="220" height="6" fill="#0a1828"/>
+<text x="760" y="103" text-anchor="middle" font-family="Courier New" font-size="12" font-weight="bold" fill="#44aaff">conv_controller</text>
+<text x="760" y="124" text-anchor="middle" font-family="Courier New" font-size="9" fill="#2288cc">u_conv_ctrl</text>
+<text x="658" y="144" font-family="Courier New" font-size="7.5" fill="#1a5a88">wmem_rd_data[31:0] (in)</text>
+<text x="658" y="158" font-family="Courier New" font-size="7.5" fill="#2266aa">wmem_addr[31:0] / rd_en (out)</text>
+<text x="658" y="174" font-family="Courier New" font-size="7.5" fill="#1a5a88">imem_rd_data[31:0] (in)</text>
+<text x="658" y="188" font-family="Courier New" font-size="7.5" fill="#2266aa">imem_addr[31:0] / rd_en (out)</text>
+<text x="658" y="204" font-family="Courier New" font-size="7.5" fill="#2266aa">omem_addr[31:0] / wr_en (out)</text>
+<text x="658" y="222" font-family="Courier New" font-size="7.5" fill="#2288cc">wbuf_load_en (out)</text>
+<text x="658" y="236" font-family="Courier New" font-size="7.5" fill="#2288cc">wbuf_load_pe_idx[3:0] (out)</text>
+<text x="658" y="250" font-family="Courier New" font-size="7.5" fill="#2288cc">wbuf_load_data[31:0] (out)</text>
+<text x="658" y="264" font-family="Courier New" font-size="7.5" fill="#2288cc">wbuf_bias_load_en/data (out)</text>
+<text x="658" y="278" font-family="Courier New" font-size="7.5" fill="#2288cc">wbuf_swap (out)</text>
+<text x="658" y="296" font-family="Courier New" font-size="7.5" fill="#2288cc">ibuf_load_en (out)</text>
+<text x="658" y="310" font-family="Courier New" font-size="7.5" fill="#2288cc">ibuf_load_pe_idx[3:0] (out)</text>
+<text x="658" y="324" font-family="Courier New" font-size="7.5" fill="#2288cc">ibuf_load_win_idx[2:0] (out)</text>
+<text x="658" y="338" font-family="Courier New" font-size="7.5" fill="#2288cc">ibuf_load_data[31:0] (out)</text>
+<text x="658" y="352" font-family="Courier New" font-size="7.5" fill="#2288cc">ibuf_swap (out)</text>
+<text x="658" y="368" font-family="Courier New" font-size="7.5" fill="#2288cc">mmu_valid_in / capture_en / obuf_rd_idx (out)</text>
+
+<line x1="650" y1="142" x2="638" y2="142" stroke="#00ff88" stroke-width="1.5"/>
+<line x1="650" y1="172" x2="638" y2="172" stroke="#00ff88" stroke-width="1.5"/>
+<line x1="870" y1="248" x2="882" y2="248" stroke="#ffaa00" stroke-width="1.5"/>
+<line x1="870" y1="312" x2="882" y2="312" stroke="#ffaa00" stroke-width="1.5"/>
+<line x1="870" y1="195" x2="882" y2="195" stroke="#ffaa00" stroke-width="1.5"/>
+
+<!-- u_fc_ctrl -->
+<rect x="650" y="470" width="220" height="315" rx="5" fill="#06101c" stroke="#44aaff" stroke-width="1.8"/>
+<rect x="650" y="470" width="220" height="26" rx="5" fill="#0a1828"/>
+<rect x="650" y="490" width="220" height="6" fill="#0a1828"/>
+<text x="760" y="485" text-anchor="middle" font-family="Courier New" font-size="12" font-weight="bold" fill="#44aaff">fc_controller</text>
+<text x="760" y="506" text-anchor="middle" font-family="Courier New" font-size="9" fill="#2288cc">u_fc_ctrl</text>
+<text x="658" y="525" font-family="Courier New" font-size="7.5" fill="#1a5a88">w1mem_rd_data[31:0] (in)</text>
+<text x="658" y="539" font-family="Courier New" font-size="7.5" fill="#2266aa">w1mem_addr / rd_en (out)</text>
+<text x="658" y="555" font-family="Courier New" font-size="7.5" fill="#1a5a88">w2mem_rd_data[31:0] (in)</text>
+<text x="658" y="569" font-family="Courier New" font-size="7.5" fill="#2266aa">w2mem_addr / rd_en (out)</text>
+<text x="658" y="585" font-family="Courier New" font-size="7.5" fill="#1a5a88">xmem_rd_data[31:0] (in)</text>
+<text x="658" y="599" font-family="Courier New" font-size="7.5" fill="#2266aa">xmem_addr / rd_en (out)</text>
+<text x="658" y="615" font-family="Courier New" font-size="7.5" fill="#2266aa">omem_addr / wr_en (out)</text>
+<text x="658" y="633" font-family="Courier New" font-size="7.5" fill="#2288cc">wbuf_load_en / k_word[6:0] (out)</text>
+<text x="658" y="647" font-family="Courier New" font-size="7.5" fill="#2288cc">wbuf_load_data[31:0] / swap (out)</text>
+<text x="658" y="663" font-family="Courier New" font-size="7.5" fill="#2288cc">ibuf_load_en / row[2:0] (out)</text>
+<text x="658" y="677" font-family="Courier New" font-size="7.5" fill="#2288cc">ibuf_load_k_word[6:0] / data (out)</text>
+<text x="658" y="691" font-family="Courier New" font-size="7.5" fill="#2288cc">ibuf_swap (out)</text>
+<text x="658" y="707" font-family="Courier New" font-size="7.5" fill="#cc44ff">ibuf_l1_capture_en / col_wr[8:0] (out)</text>
+<text x="658" y="723" font-family="Courier New" font-size="7.5" fill="#2288cc">mmu_valid_in / op_code[2:0] (out)</text>
+<text x="658" y="737" font-family="Courier New" font-size="7.5" fill="#2288cc">mmu_stage[1:0] / sub_cycle[2:0] (out)</text>
+<text x="658" y="753" font-family="Courier New" font-size="7.5" fill="#2288cc">l2_capture_en / obuf_rd_idx[2:0] (out)</text>
+<text x="658" y="769" font-family="Courier New" font-size="7.5" fill="#2288cc">done (out)</text>
+
+<line x1="650" y1="523" x2="638" y2="523" stroke="#00ff88" stroke-width="1.5"/>
+<line x1="650" y1="553" x2="638" y2="553" stroke="#00ff88" stroke-width="1.5"/>
+<line x1="650" y1="583" x2="638" y2="583" stroke="#00ff88" stroke-width="1.5"/>
+<line x1="870" y1="640" x2="882" y2="640" stroke="#ffaa00" stroke-width="1.5"/>
+<line x1="870" y1="665" x2="882" y2="665" stroke="#ffaa00" stroke-width="1.5"/>
+<line x1="870" y1="705" x2="882" y2="705" stroke="#cc44ff" stroke-width="1.5"/>
+<line x1="870" y1="612" x2="882" y2="612" stroke="#ffaa00" stroke-width="1.5"/>
+
+<!-- DSU -> conv_ctrl rd_data (green) -->
+<polyline points="622,426 636,426 636,142 650,142" fill="none" stroke="#00ff88" stroke-width="1.5" marker-end="url(#ag)"/>
+<polyline points="622,460 635,460 635,172 650,172" fill="none" stroke="#00ff88" stroke-width="1.5" marker-end="url(#ag)"/>
+<!-- conv_ctrl -> DSU addr/en -->
+<polyline points="622,426 628,426 628,195 650,195" fill="none" stroke="#ffaa00" stroke-width="1.5" marker-end="url(#ao)"/>
+
+<!-- DSU -> fc_ctrl rd_data (green) -->
+<polyline points="622,505 633,505 633,523 650,523" fill="none" stroke="#00ff88" stroke-width="1.5" marker-end="url(#ag)"/>
+<polyline points="622,505 634,505 634,553 650,553" fill="none" stroke="#00ff88" stroke-width="1.5" marker-end="url(#ag)"/>
+<polyline points="622,505 632,505 632,583 650,583" fill="none" stroke="#00ff88" stroke-width="1.5" marker-end="url(#ag)"/>
+<!-- fc_ctrl -> DSU -->
+<polyline points="622,505 629,505 629,612 650,612" fill="none" stroke="#ffaa00" stroke-width="1.5" marker-end="url(#ao)"/>
+
+<!-- labels on buses between DSU and controllers -->
+<text x="631" y="300" font-family="Courier New" font-size="7.5" fill="#00cc66" transform="rotate(-90,631,300)">rd_data conv</text>
+<text x="626" y="300" font-family="Courier New" font-size="7.5" fill="#cc8822" transform="rotate(-90,626,300)">addr/en conv</text>
+<text x="631" y="570" font-family="Courier New" font-size="7.5" fill="#00cc66" transform="rotate(-90,631,570)">rd_data x3 fc</text>
+<text x="626" y="570" font-family="Courier New" font-size="7.5" fill="#cc8822" transform="rotate(-90,626,570)">addr/en fc</text>
+
+<!-- u_wbuf -->
+<rect x="900" y="80" width="215" height="210" rx="5" fill="#10100a" stroke="#ddcc22" stroke-width="1.8"/>
+<rect x="900" y="80" width="215" height="26" rx="5" fill="#1c1a0a"/>
+<rect x="900" y="100" width="215" height="6" fill="#1c1a0a"/>
+<text x="1007" y="95" text-anchor="middle" font-family="Courier New" font-size="11" font-weight="bold" fill="#ddcc22">unified_weight_buf</text>
+<text x="1007" y="116" text-anchor="middle" font-family="Courier New" font-size="9" fill="#aaaa22">u_wbuf</text>
+<text x="908" y="138" font-family="Courier New" font-size="7.5" fill="#888822">conv_load_en / pe_idx[3:0] (in)</text>
+<text x="908" y="152" font-family="Courier New" font-size="7.5" fill="#888822">conv_load_data[31:0] (in)</text>
+<text x="908" y="166" font-family="Courier New" font-size="7.5" fill="#888822">conv_bias_load_en / data (in)</text>
+<text x="908" y="180" font-family="Courier New" font-size="7.5" fill="#888822">conv_wbuf_swap (in)</text>
+<text x="908" y="196" font-family="Courier New" font-size="7.5" fill="#888822">mlp_load_en / k_word[6:0] (in)</text>
+<text x="908" y="210" font-family="Courier New" font-size="7.5" fill="#888822">mlp_load_data[31:0] / swap (in)</text>
+<text x="908" y="224" font-family="Courier New" font-size="7.5" fill="#888822">sub_cycle[2:0] / mode (in)</text>
+<text x="908" y="246" font-family="Courier New" font-size="7.5" fill="#ccbb22">w_out[12][4][7:0] (out)</text>
+<text x="908" y="260" font-family="Courier New" font-size="7.5" fill="#ccbb22">bias_out[31:0] (out)</text>
+<text x="908" y="278" text-anchor="start" font-family="Courier New" font-size="7.5" fill="#ccbb22">--&gt; mmu_top</text>
+
+<line x1="900" y1="136" x2="888" y2="136" stroke="#ffaa00" stroke-width="1.5"/>
+<line x1="900" y1="194" x2="888" y2="194" stroke="#ffaa00" stroke-width="1.5"/>
+<line x1="1115" y1="190" x2="1127" y2="190" stroke="#00ff88" stroke-width="2"/>
+
+<polyline points="870,248 882,248 882,136 900,136" fill="none" stroke="#ffaa00" stroke-width="1.5" marker-end="url(#ao)"/>
+<polyline points="870,640 884,640 884,194 900,194" fill="none" stroke="#ffaa00" stroke-width="1.5" marker-end="url(#ao)"/>
+
+<!-- u_ibuf -->
+<rect x="900" y="448" width="215" height="235" rx="5" fill="#10100a" stroke="#ddcc22" stroke-width="1.8"/>
+<rect x="900" y="448" width="215" height="26" rx="5" fill="#1c1a0a"/>
+<rect x="900" y="468" width="215" height="6" fill="#1c1a0a"/>
+<text x="1007" y="463" text-anchor="middle" font-family="Courier New" font-size="11" font-weight="bold" fill="#ddcc22">unified_input_buf</text>
+<text x="1007" y="484" text-anchor="middle" font-family="Courier New" font-size="9" fill="#aaaa22">u_ibuf</text>
+<text x="908" y="506" font-family="Courier New" font-size="7.5" fill="#888822">conv_load_en / pe_idx / win_idx (in)</text>
+<text x="908" y="520" font-family="Courier New" font-size="7.5" fill="#888822">conv_load_data[31:0] / swap (in)</text>
+<text x="908" y="536" font-family="Courier New" font-size="7.5" fill="#888822">mlp_load_en / row[2:0] / k_word (in)</text>
+<text x="908" y="550" font-family="Courier New" font-size="7.5" fill="#888822">mlp_load_data[31:0] / swap (in)</text>
+<text x="908" y="566" font-family="Courier New" font-size="7.5" fill="#cc44ff">mlp_capture_en / col_wr[8:0] (in)</text>
+<text x="908" y="580" font-family="Courier New" font-size="7.5" fill="#cc44ff">mlp_l1_out[7][31:0] from MMU (in)</text>
+<text x="908" y="595" font-family="Courier New" font-size="7.5" fill="#888822">sub_cycle[2:0] / mode (in)</text>
+<text x="908" y="613" font-family="Courier New" font-size="7.5" fill="#ccbb22">data_out[12][7][4][7:0] (out)</text>
+<text x="908" y="627" font-family="Courier New" font-size="7.5" fill="#ccbb22">--> mmu_top</text>
+<text x="908" y="648" font-family="Courier New" font-size="7.5" fill="#888822">swap (in from ctrl)</text>
+<text x="908" y="662" font-family="Courier New" font-size="7.5" fill="#888822">ibuf_swap (in)</text>
+<text x="908" y="676" font-family="Courier New" font-size="7.5" fill="#888822">ibuf_l1_col_wr (in)</text>
+
+<line x1="900" y1="504" x2="888" y2="504" stroke="#ffaa00" stroke-width="1.5"/>
+<line x1="900" y1="534" x2="888" y2="534" stroke="#ffaa00" stroke-width="1.5"/>
+<line x1="900" y1="564" x2="888" y2="564" stroke="#cc44ff" stroke-width="1.5"/>
+<line x1="1115" y1="585" x2="1127" y2="585" stroke="#00ff88" stroke-width="2"/>
+
+<polyline points="870,312 883,312 883,504 900,504" fill="none" stroke="#ffaa00" stroke-width="1.5" marker-end="url(#ao)"/>
+<polyline points="870,665 885,665 885,534 900,534" fill="none" stroke="#ffaa00" stroke-width="1.5" marker-end="url(#ao)"/>
+<polyline points="870,705 887,705 887,564 900,564" fill="none" stroke="#cc44ff" stroke-width="1.5" marker-end="url(#ap)"/>
+
+<!-- u_mmu -->
+<rect x="1145" y="228" width="215" height="215" rx="5" fill="#1c0418" stroke="#ff44aa" stroke-width="2.2"/>
+<rect x="1145" y="228" width="215" height="28" rx="5" fill="#280622"/>
+<rect x="1145" y="250" width="215" height="6" fill="#280622"/>
+<text x="1252" y="244" text-anchor="middle" font-family="Courier New" font-size="14" font-weight="bold" fill="#ff44aa">mmu_top</text>
+<text x="1252" y="268" text-anchor="middle" font-family="Courier New" font-size="9" fill="#dd2288">u_mmu</text>
+<text x="1153" y="290" font-family="Courier New" font-size="7.5" fill="#aa1166">mmu_in[12][7][4] from u_ibuf (in)</text>
+<text x="1153" y="306" font-family="Courier New" font-size="7.5" fill="#aa1166">mmu_w[12][4] from u_wbuf (in)</text>
+<text x="1153" y="322" font-family="Courier New" font-size="7.5" fill="#aa1166">mmu_bias[12] from u_wbuf (in)</text>
+<text x="1153" y="338" font-family="Courier New" font-size="7.5" fill="#aa1166">valid_in (ctrl mux, in)</text>
+<text x="1153" y="354" font-family="Courier New" font-size="7.5" fill="#aa1166">op_code[2:0] fc_ctrl or 0 (in)</text>
+<text x="1153" y="370" font-family="Courier New" font-size="7.5" fill="#aa1166">stage[1:0] fc_ctrl or 0 (in)</text>
+<text x="1153" y="400" font-family="Courier New" font-size="7.5" fill="#ff66bb">mmu_out[7][31:0] (out)</text>
+<text x="1153" y="416" font-family="Courier New" font-size="7.5" fill="#ff66bb">valid_out (out)</text>
+<text x="1153" y="430" font-family="Courier New" font-size="7.5" fill="#ff66bb">--> output_buffer + u_ibuf(L1)</text>
+
+<line x1="1145" y1="288" x2="1133" y2="288" stroke="#00ff88" stroke-width="2"/>
+<line x1="1145" y1="304" x2="1133" y2="304" stroke="#00ff88" stroke-width="2"/>
+<line x1="1145" y1="336" x2="1133" y2="336" stroke="#ffaa00" stroke-width="1.5"/>
+<line x1="1360" y1="348" x2="1372" y2="348" stroke="#00ff88" stroke-width="2.5"/>
+
+<!-- u_ibuf -> u_mmu (data_out) -->
+<polyline points="1115,585 1133,585 1133,288 1145,288" fill="none" stroke="#00ff88" stroke-width="2" marker-end="url(#ag)"/>
+<text x="1120" y="440" font-family="Courier New" font-size="8" fill="#00cc66" transform="rotate(-90,1120,440)">data_out</text>
+<!-- u_wbuf -> u_mmu (w_out) -->
+<polyline points="1115,190 1132,190 1132,304 1145,304" fill="none" stroke="#00ff88" stroke-width="2" marker-end="url(#ag)"/>
+<text x="1124" y="247" font-family="Courier New" font-size="8" fill="#00cc66" transform="rotate(-90,1124,247)">w_out/bias</text>
+
+<!-- ctrl mux box -->
+<rect x="1050" y="336" width="88" height="46" rx="3" fill="#1a1400" stroke="#ffaa00" stroke-width="1" stroke-dasharray="4,3"/>
+<text x="1094" y="354" text-anchor="middle" font-family="Courier New" font-size="8" fill="#ffaa00">Ctrl Mux</text>
+<text x="1094" y="370" text-anchor="middle" font-family="Courier New" font-size="7" fill="#886622">mode? fc:conv</text>
+<polyline points="1138,359 1145,359 1145,336 1145,336" fill="none" stroke="#ffaa00" stroke-width="1.5" marker-end="url(#ao)"/>
+<polyline points="760,352 760,362 1050,362" fill="none" stroke="#ffaa00" stroke-width="1" stroke-dasharray="3,2" marker-end="url(#ao)" opacity="0.7"/>
+<polyline points="760,735 760,742 1044,742 1044,369 1050,369" fill="none" stroke="#ffaa00" stroke-width="1" stroke-dasharray="3,2" marker-end="url(#ao)" opacity="0.7"/>
+
+<!-- capture mux box -->
+<rect x="1050" y="430" width="88" height="46" rx="3" fill="#1a1400" stroke="#ffaa00" stroke-width="1" stroke-dasharray="4,3"/>
+<text x="1094" y="448" text-anchor="middle" font-family="Courier New" font-size="8" fill="#ffaa00">Capture Mux</text>
+<text x="1094" y="462" text-anchor="middle" font-family="Courier New" font-size="7" fill="#886622">mode? l2:conv_cap</text>
+<polyline points="760,366 754,366 754,452 1050,452" fill="none" stroke="#ffaa00" stroke-width="1" stroke-dasharray="3,2" opacity="0.5"/>
+<polyline points="760,747 752,747 752,458 1050,458" fill="none" stroke="#ffaa00" stroke-width="1" stroke-dasharray="3,2" opacity="0.5"/>
+
+<!-- u_obuf -->
+<rect x="1385" y="228" width="200" height="165" rx="5" fill="#0c180a" stroke="#77dd22" stroke-width="1.8"/>
+<rect x="1385" y="228" width="200" height="26" rx="5" fill="#102208"/>
+<rect x="1385" y="248" width="200" height="6" fill="#102208"/>
+<text x="1485" y="243" text-anchor="middle" font-family="Courier New" font-size="12" font-weight="bold" fill="#77dd22">output_buffer</text>
+<text x="1485" y="264" text-anchor="middle" font-family="Courier New" font-size="9" fill="#55aa22">u_obuf</text>
+<text x="1393" y="286" font-family="Courier New" font-size="7.5" fill="#3d8822">mmu_out[7][31:0] from u_mmu (in)</text>
+<text x="1393" y="300" font-family="Courier New" font-size="7.5" fill="#3d8822">capture_en from mux (in)</text>
+<text x="1393" y="314" font-family="Courier New" font-size="7.5" fill="#3d8822">rd_idx[2:0] from ctrl mux (in)</text>
+<text x="1393" y="350" font-family="Courier New" font-size="7.5" fill="#77dd22">rd_data[31:0] (out)</text>
+<text x="1393" y="366" font-family="Courier New" font-size="7.5" fill="#77dd22">--> DSU.obuf_rd_data</text>
+
+<line x1="1385" y1="284" x2="1373" y2="284" stroke="#00ff88" stroke-width="2"/>
+<line x1="1385" y1="298" x2="1373" y2="298" stroke="#ffaa00" stroke-width="1.5"/>
+<line x1="1585" y1="358" x2="1597" y2="358" stroke="#00ff88" stroke-width="1.5"/>
+
+<!-- u_mmu -> u_obuf -->
+<polyline points="1360,348 1373,348 1373,284 1385,284" fill="none" stroke="#00ff88" stroke-width="2.5" marker-end="url(#ag)"/>
+<text x="1365" y="318" font-family="Courier New" font-size="8" fill="#00ff88" transform="rotate(-90,1365,318)">mmu_out[7]</text>
+
+<!-- capture_mux -> u_obuf -->
+<polyline points="1138,453 1375,453 1375,298 1385,298" fill="none" stroke="#ffaa00" stroke-width="1.5" marker-end="url(#ao)"/>
+
+<!-- ctrl mux rd_idx to u_obuf -->
+<polyline points="1094,336 1094,320 1378,320 1378,314 1385,314" fill="none" stroke="#ffaa00" stroke-width="1" stroke-dasharray="3,2" marker-end="url(#ao)" opacity="0.7"/>
+
+<!-- u_obuf -> DSU obuf_rd_data (green, long path) -->
+<polyline points="1585,358 1605,358 1605,880 510,880 510,630" fill="none" stroke="#00ff88" stroke-width="1.5" marker-end="url(#ag)"/>
+<text x="1050" y="875" font-family="Courier New" font-size="8" fill="#00cc66">obuf_rd_data[31:0] --> DSU</text>
+
+<!-- MMU L1 feedback -> u_ibuf (purple dashed) -->
+<polyline points="1360,420 1365,420 1365,900 908,900 908,683 900,683" fill="none" stroke="#cc44ff" stroke-width="1.5" stroke-dasharray="6,3" marker-end="url(#ap)"/>
+<text x="1040" y="895" font-family="Courier New" font-size="8" fill="#cc44ff">mmu_out -> ibuf.mlp_l1_out (L1 Y capture, no DSU)</text>
+
+<!-- u_omem -->
+<rect x="1625" y="228" width="220" height="155" rx="5" fill="#07190e" stroke="#00ff88" stroke-width="1.8"/>
+<rect x="1625" y="228" width="220" height="26" rx="5" fill="#0b2414"/>
+<rect x="1625" y="248" width="220" height="6" fill="#0b2414"/>
+<text x="1735" y="243" text-anchor="middle" font-family="Courier New" font-size="12" font-weight="bold" fill="#00ff88">output_memory</text>
+<text x="1735" y="264" text-anchor="middle" font-family="Courier New" font-size="9" fill="#44aa77">u_omem</text>
+<text x="1735" y="282" text-anchor="middle" font-family="Courier New" font-size="8.5" fill="#336655">301 056 x 32-bit words</text>
+<text x="1735" y="297" text-anchor="middle" font-family="Courier New" font-size="8" fill="#2a5544">Conv: 56x56x96 | MLP: 3136x96</text>
+<text x="1633" y="317" font-family="Courier New" font-size="7.5" fill="#336655">wr_addr[18:0] / wr_data[31:0] / wr_en (in)</text>
+<text x="1633" y="333" font-family="Courier New" font-size="7.5" fill="#336655">rd_addr[18:0] / rd_en (in from CPU)</text>
+<text x="1633" y="349" font-family="Courier New" font-size="7.5" fill="#336655">rd_data[31:0] (out to CPU)</text>
+<text x="1633" y="366" font-family="Courier New" font-size="7.5" fill="#2a5544">(DSU write engine results)</text>
+<text x="1633" y="380" font-family="Courier New" font-size="7.5" fill="#2a5544">(CPU read results after done=1)</text>
+
+<line x1="1625" y1="315" x2="1613" y2="315" stroke="#00ff88" stroke-width="1.5"/>
+<line x1="1625" y1="331" x2="1613" y2="331" stroke="#44aaff" stroke-width="1.5"/>
+<line x1="1845" y1="347" x2="1857" y2="347" stroke="#44aaff" stroke-width="1.5"/>
+
+<!-- DSU -> u_omem (wr) - green path through top -->
+<polyline points="610,568 615,568 615,205 1612,205 1612,315 1625,315" fill="none" stroke="#00ff88" stroke-width="2" marker-end="url(#ag)"/>
+<text x="850" y="201" font-family="Courier New" font-size="8" fill="#00cc66">omem_wr_addr[18:0] / wr_data[31:0] / wr_en</text>
+
+<!-- CPU/DMA output read block -->
+<rect x="1855" y="230" width="80" height="75" rx="4" fill="#08101c" stroke="#44aaff" stroke-width="1.5"/>
+<text x="1895" y="252" text-anchor="middle" font-family="Courier New" font-size="9" font-weight="bold" fill="#44aaff">CPU/DMA</text>
+<text x="1895" y="268" text-anchor="middle" font-family="Courier New" font-size="8" fill="#2278bb">Output RD</text>
+<text x="1895" y="284" text-anchor="middle" font-family="Courier New" font-size="7" fill="#1a5588">rd_addr[18:0]</text>
+<text x="1895" y="298" text-anchor="middle" font-family="Courier New" font-size="7" fill="#44aaff">rd_data[31:0]</text>
+<polyline points="1845,347 1857,347 1857,290 1855,290" fill="none" stroke="#44aaff" stroke-width="1.5" marker-end="url(#ab)"/>
+
+<!-- Top-level control ports block -->
+<rect x="640" y="910" width="550" height="95" rx="5" fill="#0c0c1c" stroke="#aaaaff" stroke-width="1.5"/>
+<rect x="640" y="910" width="550" height="26" rx="5" fill="#10102a"/>
+<rect x="640" y="930" width="550" height="6" fill="#10102a"/>
+<text x="915" y="925" text-anchor="middle" font-family="Courier New" font-size="12" font-weight="bold" fill="#aaaaff">TOP-LEVEL PORTS: mode / start / done</text>
+<text x="915" y="950" text-anchor="middle" font-family="Courier New" font-size="8.5" fill="#7777cc">mode[0] --> conv_ctrl, fc_ctrl, dsu, u_wbuf, u_ibuf (select conv or MLP routing)</text>
+<text x="915" y="966" text-anchor="middle" font-family="Courier New" font-size="8.5" fill="#7777cc">start --> conv_ctrl (start AND NOT mode) | fc_ctrl (start AND mode)</text>
+<text x="915" y="982" text-anchor="middle" font-family="Courier New" font-size="8.5" fill="#7777cc">done = (mode==0) ? conv_done : fc_done</text>
+
+<!-- Memory address map -->
+<rect x="30" y="760" width="400" height="190" rx="4" fill="#060e06" stroke="#1c3a20" stroke-width="1.5"/>
+<text x="230" y="780" text-anchor="middle" font-family="Courier New" font-size="10" font-weight="bold" fill="#ffaa00">MEMORY ADDRESS MAP</text>
+<line x1="30" y1="788" x2="430" y2="788" stroke="#1c3a20" stroke-width="0.8"/>
+<text x="40" y="804" font-family="Courier New" font-size="8.5" fill="#cc8822" font-weight="bold">weight_memory (18 432 x 32b):</text>
+<text x="40" y="819" font-family="Courier New" font-size="8" fill="#448866">  Conv  w[0..1247]    96 kernels (12w+bias each)</text>
+<text x="40" y="833" font-family="Courier New" font-size="8" fill="#448866">  MLP   W1[0..9215]  384c x 24w col-major</text>
+<text x="40" y="847" font-family="Courier New" font-size="8" fill="#448866">         W2[9216..18431]  96c x 96w (+DSU offset)</text>
+<text x="40" y="864" font-family="Courier New" font-size="8.5" fill="#cc8822" font-weight="bold">fib_memory (75 264 x 32b):</text>
+<text x="40" y="879" font-family="Courier New" font-size="8" fill="#448866">  Conv  image[0..37631]  CHW 224x224x3</text>
+<text x="40" y="893" font-family="Courier New" font-size="8" fill="#448866">  MLP   X[0..75263]     3136r x 24w</text>
+<text x="40" y="910" font-family="Courier New" font-size="8.5" fill="#cc8822" font-weight="bold">output_memory (301 056 x 32b):</text>
+<text x="40" y="925" font-family="Courier New" font-size="8" fill="#448866">  Conv out[0..301055]  56x56x96</text>
+<text x="40" y="939" font-family="Courier New" font-size="8" fill="#448866">  MLP  Z[0..301055]   3136x96</text>
+
+<!-- Data flow summary -->
+<rect x="1250" y="540" width="700" height="220" rx="4" fill="#060e06" stroke="#1c3a20" stroke-width="1.5"/>
+<text x="1600" y="562" text-anchor="middle" font-family="Courier New" font-size="10" font-weight="bold" fill="#ffaa00">DATA FLOW SUMMARY</text>
+<line x1="1250" y1="570" x2="1950" y2="570" stroke="#1c3a20" stroke-width="0.8"/>
+<text x="1260" y="588" font-family="Courier New" font-size="9" fill="#55aa55" font-weight="bold">CONV MODE (mode=0):</text>
+<text x="1260" y="604" font-family="Courier New" font-size="8" fill="#448866">  weight_mem --DSU--&gt; conv_ctrl --&gt; u_wbuf --&gt; u_mmu</text>
+<text x="1260" y="618" font-family="Courier New" font-size="8" fill="#448866">  fib_mem    --DSU--&gt; conv_ctrl --&gt; u_ibuf --&gt; u_mmu</text>
+<text x="1260" y="632" font-family="Courier New" font-size="8" fill="#448866">  u_mmu --&gt; output_buffer --DSU--&gt; output_memory</text>
+<line x1="1260" y1="646" x2="1940" y2="646" stroke="#1c3a20" stroke-width="0.6"/>
+<text x="1260" y="664" font-family="Courier New" font-size="9" fill="#55aa55" font-weight="bold">MLP MODE (mode=1):</text>
+<text x="1260" y="680" font-family="Courier New" font-size="8" fill="#448866">  weight_mem --DSU--&gt; fc_ctrl --&gt; u_wbuf --&gt; u_mmu</text>
+<text x="1260" y="694" font-family="Courier New" font-size="8" fill="#448866">  fib_mem    --DSU--&gt; fc_ctrl --&gt; u_ibuf --&gt; u_mmu</text>
+<text x="1260" y="708" font-family="Courier New" font-size="8" fill="#cc44ff">  L1: mmu_out ------directly------&gt; u_ibuf (Y accum, no DSU)</text>
+<text x="1260" y="722" font-family="Courier New" font-size="8" fill="#448866">  L2: mmu_out --&gt; output_buffer --DSU--&gt; output_memory</text>
+<line x1="1260" y1="736" x2="1940" y2="736" stroke="#1c3a20" stroke-width="0.6"/>
+<text x="1260" y="752" font-family="Courier New" font-size="8" fill="#5588aa">  Buffers double-buffered via swap signal</text>
+<text x="1260" y="767" font-family="Courier New" font-size="8" fill="#5588aa">  sub_cycle controls MLP read offset in unified bufs</text>
+
+</svg>
+</div>
+</div>
+
+<script>
+const vp = document.getElementById('viewport');
+const world = document.getElementById('world');
+let scale = 1, tx = 0, ty = 0, dragging = false, ox, oy;
+
+function apply() {
+  world.style.transform = 'translate(' + tx + 'px,' + ty + 'px) scale(' + scale + ')';
+  world.style.transformOrigin = '0 0';
+}
+
+function fitToScreen() {
+  const vw = vp.clientWidth, vh = vp.clientHeight;
+  scale = Math.min(vw / 2400, vh / 1300) * 0.96;
+  tx = (vw - 2400 * scale) / 2;
+  ty = Math.max(2, (vh - 1300 * scale) / 2);
+  apply();
+}
+
+window.addEventListener('load', fitToScreen);
+window.addEventListener('resize', fitToScreen);
+
+vp.addEventListener('wheel', function(e) {
+  e.preventDefault();
+  var r = vp.getBoundingClientRect();
+  var mx = e.clientX - r.left;
+  var my = e.clientY - r.top;
+  var factor = e.deltaY < 0 ? 1.12 : 0.89;
+  var ns = Math.max(0.2, Math.min(6, scale * factor));
+  tx = mx - (mx - tx) * (ns / scale);
+  ty = my - (my - ty) * (ns / scale);
+  scale = ns;
+  apply();
+}, { passive: false });
+
+vp.addEventListener('mousedown', function(e) {
+  dragging = true;
+  vp.classList.add('dragging');
+  ox = e.clientX - tx;
+  oy = e.clientY - ty;
+});
+window.addEventListener('mousemove', function(e) {
+  if (!dragging) return;
+  tx = e.clientX - ox;
+  ty = e.clientY - oy;
+  apply();
+});
+window.addEventListener('mouseup', function() {
+  dragging = false;
+  vp.classList.remove('dragging');
+});
+</script>
+</body>
+</html>
